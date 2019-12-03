@@ -127,10 +127,10 @@ public class GUI {
 		txtInputGrade.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(e.getSource() == txtInputGrade) {
-					if(chckbxAppendGrade.isSelected()) {
+					if(!chckbxAppendGrade.isSelected()) {
 						dataSet.clear();
 						dataSet.add(Double.parseDouble(txtInputGrade.getText()));
-					} else if(!chckbxAppendGrade.isSelected() ) {
+					} else if(chckbxAppendGrade.isSelected() ) {
 						dataSet.add(Double.parseDouble(txtInputGrade.getText()));
 					}
 				}
@@ -236,7 +236,9 @@ public class GUI {
 		btnDisplayColumns.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(e.getSource() == btnDisplayColumns) {
+					textArea.setText("");
 					for(int i=0; i<dataSet.size(); i++) {
+						
 						textArea.append(Double.toString(dataSet.get(i)) + "\n");
 					}
 				}
