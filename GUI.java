@@ -1,25 +1,25 @@
 import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import java.awt.GridBagLayout;
 import javax.swing.JTabbedPane;
 import java.awt.GridBagConstraints;
-import java.awt.FlowLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.RowSpec;
-import com.jgoodies.forms.layout.FormSpecs;
-import java.awt.BorderLayout;
 import java.awt.Insets;
 import javax.swing.JTextArea;
 import javax.swing.JLabel;
 import java.awt.Font;
 import java.awt.event.ActionListener;
+import java.awt.print.Printable;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.Scanner;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
 import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
 
 public class GUI {
 
@@ -28,7 +28,7 @@ public class GUI {
 	private JTextField txtMinGrade;
 	private JTextField txtMaxGrade;
 	private JTextField txtGradeToDelete;
-
+	private ArrayList<Double> dataSet=new ArrayList<Double>();
 	/**
 	 * Launch the application.
 	 */
@@ -67,7 +67,7 @@ public class GUI {
 		gridBagLayout.rowWeights = new double[]{1.0, 0.0, Double.MIN_VALUE};
 		frame.getContentPane().setLayout(gridBagLayout);
 		
-		//tab 1 begins
+		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		GridBagConstraints gbc_tabbedPane = new GridBagConstraints();
 		gbc_tabbedPane.insets = new Insets(0, 0, 5, 0);
@@ -77,7 +77,7 @@ public class GUI {
 		gbc_tabbedPane.gridy = 0;
 		frame.getContentPane().add(tabbedPane, gbc_tabbedPane);
 		
-		//tab 2 begins
+		//tab 1 begins
 		JPanel DataEntryTab = new JPanel();
 		tabbedPane.addTab("Data Entry", null, DataEntryTab, null);
 		GridBagLayout gbl_DataEntryTab = new GridBagLayout();
@@ -97,11 +97,26 @@ public class GUI {
 		
 		JButton btnNewButton = new JButton("Upload Grade File");
 		btnNewButton.addActionListener(new ActionListener() {
-			
+			final JFileChooser fc = new JFileChooser();
 			public void actionPerformed(ActionEvent e) {
+				if(e.getSource() == btnNewButton) {
+					final JFileChooser fc = new JFileChooser();
+	                if (e.getSource() == btnNewButton) {
+	                    int returnVal = fc.showOpenDialog(frame);
+	                    File file = fc.getSelectedFile();
+	                    String fileExtention= file.getName().substring(file.getName().lastIndexOf('.') + 1);
+	                    if(fileExtention.charAt(0) == 'c') { //checks if it's a .csv file
+	                    	ReadinDataSet(true, file);
+	                    } else if(fileExtention.charAt(0) == 't') { //checks if its a .txt file
+	                    	ReadinDataSet(false, file);
+	                    }
+	                }
+				}
 				
 			}
 		});
+		JCheckBox chckbxAppendGrade=new JCheckBox("Append Grade");;
+		
 		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
 		gbc_btnNewButton.insets = new Insets(0, 0, 5, 5);
 		gbc_btnNewButton.gridx = 1;
@@ -111,7 +126,14 @@ public class GUI {
 		txtInputGrade = new JTextField();
 		txtInputGrade.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+				if(e.getSource() == txtInputGrade) {
+					if(chckbxAppendGrade.isSelected()) {
+						dataSet.clear();
+						dataSet.add(Double.parseDouble(txtInputGrade.getText()));
+					} else if(!chckbxAppendGrade.isSelected() ) {
+						dataSet.add(Double.parseDouble(txtInputGrade.getText()));
+					}
+				}
 			}
 		});
 		txtInputGrade.setText("Input Grade");
@@ -123,7 +145,7 @@ public class GUI {
 		DataEntryTab.add(txtInputGrade, gbc_txtInputGrade);
 		txtInputGrade.setColumns(10);
 		
-		JCheckBox chckbxAppendGrade = new JCheckBox("Append Grade");
+		
 		chckbxAppendGrade.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
@@ -138,6 +160,10 @@ public class GUI {
 		txtMinGrade = new JTextField();
 		txtMinGrade.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if(e.getSource() == txtMinGrade) {
+				int max=0;
+				EliminateMaxFromDataSet(dataSet, max);}
+				
 			}
 		});
 		txtMinGrade.setText("Min Grade");
@@ -152,6 +178,10 @@ public class GUI {
 		txtMaxGrade = new JTextField();
 		txtMaxGrade.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if(e.getSource() == txtMaxGrade) {
+				int min=0;
+				EliminateMinFromDataSet(dataSet, min); 
+				}
 			}
 		});
 		txtMaxGrade.setText("Max Grade");
@@ -166,6 +196,7 @@ public class GUI {
 		txtGradeToDelete = new JTextField();
 		txtGradeToDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+			
 			}
 		});
 		txtGradeToDelete.setText("Grade to Delete");
@@ -177,7 +208,8 @@ public class GUI {
 		DataEntryTab.add(txtGradeToDelete, gbc_txtGradeToDelete);
 		txtGradeToDelete.setColumns(10);
 		
-		//tab 3 begins
+		//tab 2 begins
+		JTextArea textArea = new JTextArea();
 		JPanel AnalysisTab = new JPanel();
 		tabbedPane.addTab("Analysis", null, AnalysisTab, null);
 		GridBagLayout gbl_AnalysisTab = new GridBagLayout();
@@ -203,8 +235,14 @@ public class GUI {
 		JButton btnDisplayColumns = new JButton("Display Columns");
 		btnDisplayColumns.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if(e.getSource() == btnDisplayColumns) {
+					for(int i=0; i<dataSet.size(); i++) {
+						textArea.append(Double.toString(dataSet.get(i)) + "\n");
+					}
+				}
 			}
 		});
+		
 		GridBagConstraints gbc_btnDisplayColumns = new GridBagConstraints();
 		gbc_btnDisplayColumns.gridwidth = 2;
 		gbc_btnDisplayColumns.insets = new Insets(0, 0, 5, 5);
@@ -236,7 +274,7 @@ public class GUI {
 		gbc_btnDistribution.gridy = 3;
 		AnalysisTab.add(btnDistribution, gbc_btnDistribution);
 		
-		JTextArea textArea = new JTextArea();
+		
 		GridBagConstraints gbc_textArea = new GridBagConstraints();
 		gbc_textArea.gridwidth = 2;
 		gbc_textArea.fill = GridBagConstraints.BOTH;
@@ -244,7 +282,7 @@ public class GUI {
 		gbc_textArea.gridy = 4;
 		AnalysisTab.add(textArea, gbc_textArea);
 		
-		//tab 4 begins
+		//tab 3 begins
 		JPanel ErrorsTab = new JPanel();
 		tabbedPane.addTab("Errors", null, ErrorsTab, null);
 		GridBagLayout gbl_ErrorsTab = new GridBagLayout();
@@ -295,5 +333,48 @@ public class GUI {
 		gbc_btnNewButton_2.gridy = 3;
 		ReportTab.add(btnNewButton_2, gbc_btnNewButton_2);
 	}
+	
+	public void ReadinDataSet(boolean fileType, File file) {
+        if(fileType == true) {
+            try {
+                BufferedReader br = new BufferedReader(new FileReader(file));
+                Scanner rd = new Scanner(br);
+                
+        
+                rd.useDelimiter(",");
+                while(rd.hasNext()) {
+                	dataSet.add(Double.parseDouble(rd.next()));
+                }
+                
+                
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+        else if(fileType == false) {
+        	try {
+                BufferedReader br = new BufferedReader(new FileReader(file));
+                Scanner rd = new Scanner(br);
+                
+                	rd.useDelimiter("\n");
+                	 while(rd.hasNext()) {
+                     	dataSet.add(Double.parseDouble(rd.next()));
+                     }
+                
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+	
+	public void EliminateMaxFromDataSet(ArrayList <Double> dataSet, int max) {
+		
+	}
+	
+	public void EliminateMinFromDataSet(ArrayList <Double> dataSet, int min) {
+		
+	}
+	
 
 }
