@@ -58,7 +58,7 @@ public class GUI {
 	private void initialize() {
 		
 		frame = new JFrame();
-		frame.setBounds(100, 100, 450, 300);
+		frame.setBounds(100, 100, 810, 501);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0};
@@ -78,22 +78,15 @@ public class GUI {
 		frame.getContentPane().add(tabbedPane, gbc_tabbedPane);
 		
 		//tab 1 begins
+		JCheckBox chckbxAppendGrade=new JCheckBox("Append Grade");
 		JPanel DataEntryTab = new JPanel();
 		tabbedPane.addTab("Data Entry", null, DataEntryTab, null);
 		GridBagLayout gbl_DataEntryTab = new GridBagLayout();
 		gbl_DataEntryTab.columnWidths = new int[]{161, 0, 106, 0};
-		gbl_DataEntryTab.rowHeights = new int[]{21, 0, 0, 0, 0, 0, 0, 0, 0};
+		gbl_DataEntryTab.rowHeights = new int[]{21, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 		gbl_DataEntryTab.columnWeights = new double[]{0.0, 1.0, 0.0, Double.MIN_VALUE};
-		gbl_DataEntryTab.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_DataEntryTab.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		DataEntryTab.setLayout(gbl_DataEntryTab);
-		
-		JLabel lblGradeInputs = new JLabel("Grade Inputs");
-		lblGradeInputs.setFont(new Font("Lucida Grande", Font.PLAIN, 17));
-		GridBagConstraints gbc_lblGradeInputs = new GridBagConstraints();
-		gbc_lblGradeInputs.insets = new Insets(0, 0, 5, 5);
-		gbc_lblGradeInputs.gridx = 1;
-		gbc_lblGradeInputs.gridy = 0;
-		DataEntryTab.add(lblGradeInputs, gbc_lblGradeInputs);
 		
 		JButton btnNewButton = new JButton("Upload Grade File");
 		btnNewButton.addActionListener(new ActionListener() {
@@ -105,6 +98,11 @@ public class GUI {
 	                    int returnVal = fc.showOpenDialog(frame);
 	                    File file = fc.getSelectedFile();
 	                    String fileExtention= file.getName().substring(file.getName().lastIndexOf('.') + 1);
+	                    
+	                    if(!chckbxAppendGrade.isSelected()) {
+	                    	dataSet.clear();
+	                    }
+	                    
 	                    if(fileExtention.charAt(0) == 'c') { //checks if it's a .csv file
 	                    	ReadinDataSet(true, file);
 	                    } else if(fileExtention.charAt(0) == 't') { //checks if its a .txt file
@@ -115,7 +113,7 @@ public class GUI {
 				
 			}
 		});
-		JCheckBox chckbxAppendGrade=new JCheckBox("Append Grade");;
+	
 		
 		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
 		gbc_btnNewButton.insets = new Insets(0, 0, 5, 5);
@@ -158,14 +156,7 @@ public class GUI {
 		DataEntryTab.add(chckbxAppendGrade, gbc_chckbxAppendGrade);
 		
 		txtMinGrade = new JTextField();
-		txtMinGrade.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if(e.getSource() == txtMinGrade) {
-				int max=0;
-				EliminateMaxFromDataSet(dataSet, max);}
-				
-			}
-		});
+		
 		txtMinGrade.setText("Min Grade");
 		GridBagConstraints gbc_txtMinGrade = new GridBagConstraints();
 		gbc_txtMinGrade.insets = new Insets(0, 0, 5, 5);
@@ -176,14 +167,6 @@ public class GUI {
 		txtMinGrade.setColumns(10);
 		
 		txtMaxGrade = new JTextField();
-		txtMaxGrade.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if(e.getSource() == txtMaxGrade) {
-				int min=0;
-				EliminateMinFromDataSet(dataSet, min); 
-				}
-			}
-		});
 		txtMaxGrade.setText("Max Grade");
 		GridBagConstraints gbc_txtMaxGrade = new GridBagConstraints();
 		gbc_txtMaxGrade.insets = new Insets(0, 0, 5, 5);
@@ -193,9 +176,30 @@ public class GUI {
 		DataEntryTab.add(txtMaxGrade, gbc_txtMaxGrade);
 		txtMaxGrade.setColumns(10);
 		
+		JButton btnSetBounds = new JButton("Set Bounds");
+		btnSetBounds.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(e.getSource() == btnSetBounds) {
+					double max=Double.parseDouble(txtMaxGrade.getText());
+					double min=Double.parseDouble(txtMinGrade.getText());
+					EliminateMaxFromDataSet(dataSet, max );
+					EliminateMinFromDataSet(dataSet, min);
+				}
+			}
+		});
+		GridBagConstraints gbc_btnSetBounds = new GridBagConstraints();
+		gbc_btnSetBounds.insets = new Insets(0, 0, 5, 5);
+		gbc_btnSetBounds.gridx = 1;
+		gbc_btnSetBounds.gridy = 6;
+		DataEntryTab.add(btnSetBounds, gbc_btnSetBounds);
+		
 		txtGradeToDelete = new JTextField();
 		txtGradeToDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if(e.getSource() == txtGradeToDelete) {
+				Double gradeToDelete=Double.parseDouble(txtGradeToDelete.getText());
+				DataAnalysis.deleteGrade(dataSet,gradeToDelete);
+				}
 			
 			}
 		});
@@ -204,7 +208,7 @@ public class GUI {
 		gbc_txtGradeToDelete.insets = new Insets(0, 0, 5, 5);
 		gbc_txtGradeToDelete.fill = GridBagConstraints.HORIZONTAL;
 		gbc_txtGradeToDelete.gridx = 1;
-		gbc_txtGradeToDelete.gridy = 6;
+		gbc_txtGradeToDelete.gridy = 7;
 		DataEntryTab.add(txtGradeToDelete, gbc_txtGradeToDelete);
 		txtGradeToDelete.setColumns(10);
 		
@@ -222,6 +226,20 @@ public class GUI {
 		JButton btnGenerateData = new JButton("Generate Data");
 		btnGenerateData.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if(e.getSource() == btnGenerateData) {
+					textArea.setText("");
+					textArea.append("Number Of Enteries:" + DataAnalysis.getNumEntries(dataSet) + "\n");
+					textArea.append("Highest Grade:" + DataAnalysis.getHighestGrade(dataSet) + "\n");
+					textArea.append("Lowest Grade:" + DataAnalysis.getLowestGrade(dataSet) + "\n");
+					textArea.append("Mean:" + DataAnalysis.getMean(dataSet) + "\n");
+					textArea.append("Median:" + DataAnalysis.getMedian(dataSet) + "\n");
+					if(DataAnalysis.getMode(dataSet).isEmpty()) {
+						textArea.append("Mode:" + "\n");
+					}
+					else {
+						textArea.append("Mode:" + DataAnalysis.getMode(dataSet) + "\n");
+					}
+				}
 			}
 		});
 		GridBagConstraints gbc_btnGenerateData = new GridBagConstraints();
@@ -370,12 +388,25 @@ public class GUI {
         }
     }
 	
-	public void EliminateMaxFromDataSet(ArrayList <Double> dataSet, int max) {
+	public void EliminateMaxFromDataSet(ArrayList <Double> dataSet, double max) {
+		for(int i=0; i<dataSet.size(); i++) {
+			if(dataSet.get(i) > max) {
+				dataSet.remove(i); //messes up ordering of checking 
+				i=-1;
+			}
+		}
+		
 		
 	}
 	
-	public void EliminateMinFromDataSet(ArrayList <Double> dataSet, int min) {
+	public void EliminateMinFromDataSet(ArrayList <Double> dataSet, double min) {
 		
+		for(int i=0; i<dataSet.size(); i++) {
+			if(dataSet.get(i) < min) {
+				dataSet.remove(i);  //messes up ordering of checking ex:80,81,82,85 First 80 is deleted and then 81 is placed at index 0 while i is at index 1 
+				i=-1; //resets i to start from beggining of arraylist again
+			}
+		}
 	}
 	
 
