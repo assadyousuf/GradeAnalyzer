@@ -27,6 +27,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
 
 public class GUI {
 
@@ -38,6 +40,8 @@ public class GUI {
 	private ArrayList<Double> dataSet=new ArrayList<Double>();
 	private JTextArea UserHistoryTextArea = new JTextArea();
 	private JTextArea textArea = new JTextArea();
+	private String errorLogString="";
+	private JTextArea textArea_1 = new JTextArea();
 	/**
 	 * Launch the application.
 	 */
@@ -73,6 +77,13 @@ public class GUI {
 		
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				if(tabbedPane.getSelectedIndex()==2) {
+					textArea_1.append(errorLogString);
+				}
+			}
+		});
 		frame.getContentPane().add(tabbedPane);
 		
 		//tab 1 begins
@@ -102,6 +113,7 @@ public class GUI {
 	                    	UserHistoryTextArea.setText("");
 	                    	textArea.setText("");
 	                    	dataSet.clear();
+	                    	errorLogString="";
 	                    }
 	                    
 	                    if(fileExtention.charAt(0) == 'c') { //checks if it's a .csv file
@@ -127,11 +139,18 @@ public class GUI {
 			public void actionPerformed(ActionEvent e) {
 				if(e.getSource() == txtInputGrade) {
 					if(!chckbxAppendGrade.isSelected()) {
-						dataSet.clear();
+						dataSet.clear();}
+					
+						try { 
 						dataSet.add(Double.parseDouble(txtInputGrade.getText()));
-					} else if(chckbxAppendGrade.isSelected() ) {
-						dataSet.add(Double.parseDouble(txtInputGrade.getText()));
-					}
+						}
+						catch(Exception error) {
+							UserHistoryTextArea.append("ERROR: Grade Inputed is not a number...\n");
+							errorLogString=errorLogString+ "ERROR: Grade Inputed is not a number...\n";
+						}
+					 
+						
+					
 				}
 			}
 		});
@@ -180,11 +199,28 @@ public class GUI {
 		JButton btnSetBounds = new JButton("Set Bounds");
 		btnSetBounds.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(e.getSource() == btnSetBounds) {
-					double max=Double.parseDouble(txtMaxGrade.getText());
-					double min=Double.parseDouble(txtMinGrade.getText());
+				
+				if(e.getSource() == btnSetBounds && checkIfDatatSetIsEmpty() == false) {
+					double max=0.0;
+					double min=0.0;
+					try {
+					max=Double.parseDouble(txtMaxGrade.getText());}
+					catch (Exception error) {
+						errorLogString=errorLogString+"Max Bound is not a float or integer";
+					}
+					try {
+					min=Double.parseDouble(txtMinGrade.getText());}
+					catch (Exception error) {
+						errorLogString=errorLogString+"Min Bound is not a float or integer";
+					}
+					UserHistoryTextArea.append("Setting new bounds\n");
 					EliminateMaxFromDataSet(dataSet, max );
 					EliminateMinFromDataSet(dataSet, min);
+				}
+				
+				else if(checkIfDatatSetIsEmpty()==true) {
+					UserHistoryTextArea.append("Cannot Set Bounds of an Empty dataset!\n");
+					errorLogString=errorLogString+"Cannot Set Bounds of an Empty dataset!\n";
 				}
 			}
 		});
@@ -197,9 +233,24 @@ public class GUI {
 		txtGradeToDelete = new JTextField();
 		txtGradeToDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(e.getSource() == txtGradeToDelete) {
-				Double gradeToDelete=Double.parseDouble(txtGradeToDelete.getText());
-				DataAnalysis.deleteGrade(dataSet,gradeToDelete);
+				if(e.getSource() == txtGradeToDelete && checkIfDatatSetIsEmpty()==false) {
+					Double gradeToDelete=0.0;
+					try {
+				 gradeToDelete=Double.parseDouble(txtGradeToDelete.getText());
+					}
+					catch(Exception erorr) {
+						errorLogString=errorLogString+"Grade you are trying to delete is not a float or integer\n";
+					}
+					if(DataAnalysis.deleteGrade(dataSet,gradeToDelete) == true) {
+				UserHistoryTextArea.append("Deleting Grade " + gradeToDelete + "...");
+					} else {
+						errorLogString=errorLogString+"The grade "+gradeToDelete + " is not in the dataset\n";
+						UserHistoryTextArea.append("The grade "+gradeToDelete + " is not in the dataset\n");
+					}
+				} 
+				else if(checkIfDatatSetIsEmpty()==true) {
+					UserHistoryTextArea.append("Cannot Delete a grade from a Empty dataset!\n");
+					errorLogString=errorLogString+"Cannot Delete a grade from a Empty dataset!\n";
 				}
 			
 			}
@@ -229,7 +280,7 @@ public class GUI {
 		JButton btnGenerateData = new JButton("Generate Data");
 		btnGenerateData.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(e.getSource() == btnGenerateData) {
+				if(e.getSource() == btnGenerateData && checkIfDatatSetIsEmpty()==false) {
 					UserHistoryTextArea.append("Generating Data..\n");
 					textArea.setText("");
 					textArea.append("Number Of Enteries:" + DataAnalysis.getNumEntries(dataSet) + "\n");
@@ -244,6 +295,10 @@ public class GUI {
 						textArea.append("Mode:" + DataAnalysis.getMode(dataSet) + "\n");
 					}
 				}
+				else if(checkIfDatatSetIsEmpty()==true) {
+					UserHistoryTextArea.append("Cannot Generate Data of an Empty dataset!\n");
+					errorLogString=errorLogString+"Cannot Generate Data of an Empty dataset!\n";
+				}
 			}
 		});
 		GridBagConstraints gbc_btnGenerateData = new GridBagConstraints();
@@ -256,13 +311,17 @@ public class GUI {
 		JButton btnDisplayColumns = new JButton("Display Columns");
 		btnDisplayColumns.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(e.getSource() == btnDisplayColumns) {
+				if(e.getSource() == btnDisplayColumns && checkIfDatatSetIsEmpty()==false) {
 					textArea.setText("");
+					UserHistoryTextArea.append("Displaying Columns..\n");
 					for(int i=0; i<dataSet.size(); i++) {
-						UserHistoryTextArea.append("Displaying Columns..\n");
+						
 						
 						textArea.append(Double.toString(dataSet.get(i)) + "\n");
 					}
+				} else if(checkIfDatatSetIsEmpty() == true) {
+					UserHistoryTextArea.append("Cannot Display Columns of an Empty dataset!\n");
+					errorLogString=errorLogString+"Cannot Display Columns of an Empty dataset!\n";
 				}
 			}
 		});
@@ -276,8 +335,14 @@ public class GUI {
 		JButton btnDisplayGraph = new JButton("Display Graph");
 		btnDisplayGraph.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(e.getSource()==btnDisplayGraph) {
+				if(e.getSource()==btnDisplayGraph && checkIfDatatSetIsEmpty() == false) {
+					textArea.setText("");
+					UserHistoryTextArea.append("Displaying Graph...\n");
 					textArea.append(displayGraph());
+				} 
+				else if(checkIfDatatSetIsEmpty() == true) {
+					UserHistoryTextArea.append("Cannot Display Graph of an Empty dataset!\n");
+					errorLogString=errorLogString+"Cannot Display Graph of an Empty dataset!\n";
 				}
 			}
 		});
@@ -290,7 +355,16 @@ public class GUI {
 		JButton btnDistribution = new JButton("Distribution");
 		btnDistribution.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if(e.getSource()==btnDistribution && checkIfDatatSetIsEmpty()==false) {
+					textArea.setText("");
+					UserHistoryTextArea.append("Displaying Distibution...\n");
+					textArea.append(DataDistribution.displayDistrbution(dataSet));
+				} else if(checkIfDatatSetIsEmpty()==true) {
+					UserHistoryTextArea.append("Cannot Display Distribution of an Empty dataset!\n");
+					errorLogString=errorLogString+"Cannot Display Distribution of an Empty dataset!\n";
+				}
 			}
+			
 		});
 		GridBagConstraints gbc_btnDistribution = new GridBagConstraints();
 		gbc_btnDistribution.insets = new Insets(0, 0, 5, 0);
@@ -326,7 +400,7 @@ public class GUI {
 		gbc_scrollPane_1.gridy = 0;
 		ErrorsTab.add(scrollPane_1, gbc_scrollPane_1);
 		
-		JTextArea textArea_1 = new JTextArea();
+		
 		scrollPane_1.setViewportView(textArea_1);
 		
 		JPanel ReportTab = new JPanel();
@@ -338,6 +412,8 @@ public class GUI {
 		gbl_ReportTab.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
 		ReportTab.setLayout(gbl_ReportTab);
 		
+		
+		//tab 4 begins
 		JButton btnNewButton_1 = new JButton("Generate Report");
 		btnNewButton_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -407,6 +483,7 @@ public class GUI {
 	public void EliminateMaxFromDataSet(ArrayList <Double> dataSet, double max) {
 		for(int i=0; i<dataSet.size(); i++) {
 			if(dataSet.get(i) > max) {
+				UserHistoryTextArea.append("Removing " + dataSet.get(i) + " from dataset\n" );
 				dataSet.remove(i); //messes up ordering of checking 
 				i=-1;
 			}
@@ -419,6 +496,7 @@ public class GUI {
 		
 		for(int i=0; i<dataSet.size(); i++) {
 			if(dataSet.get(i) < min) {
+				UserHistoryTextArea.append("Removing " + dataSet.get(i) + " from dataset\n" );
 				dataSet.remove(i);  //messes up ordering of checking ex:80,81,82,85 First 80 is deleted and then 81 is placed at index 0 while i is at index 1 
 				i=-1; //resets i to start from beggining of arraylist again
 			}
@@ -541,6 +619,18 @@ public class GUI {
 		return graph;
 		
 	}
+	
+	public boolean checkIfDatatSetIsEmpty() {
+		if(dataSet.size()==0) {
+			return true;
+		}
+		
+		else {
+			return false;
+		}
+		
+	}
+	
 	
 
 }
