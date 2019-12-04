@@ -28,6 +28,9 @@ import java.awt.event.KeyEvent;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import javax.swing.event.ChangeListener;
+
+import org.omg.PortableInterceptor.ServerRequestInfo;
+
 import javax.swing.event.ChangeEvent;
 
 public class GUI {
@@ -454,7 +457,15 @@ public class GUI {
         
                 rd.useDelimiter(",");
                 while(rd.hasNext()) {
-                	dataSet.add(Double.parseDouble(rd.next()));
+                	String numadded=rd.next();
+                	try {
+                	dataSet.add(Double.parseDouble(numadded));
+                	UserHistoryTextArea.append("Adding " + numadded + " to dataset..\n");
+                	}
+                	catch(Exception error) {
+                		UserHistoryTextArea.append( numadded + " is not an integer or a float so it will not be added to the data set\n");
+                		errorLogString=errorLogString + numadded + " is not an integer or a float so it will not be added to the data set\n";
+                	}
                 }
                 
                 
@@ -471,7 +482,15 @@ public class GUI {
                 
                 	rd.useDelimiter("\n");
                 	 while(rd.hasNext()) {
-                     	dataSet.add(Double.parseDouble(rd.next()));
+                		 String numadded=rd.next();
+                     	try {
+                     	dataSet.add(Double.parseDouble(numadded));
+                     	UserHistoryTextArea.append("Adding " + numadded + " to dataset..\n");
+                     	}
+                     	catch(Exception error) {
+                     		UserHistoryTextArea.append( numadded + " is not an integer or a float so it will not be added to the data set\n");
+                     		errorLogString=errorLogString + numadded + " is not an integer or a float so it will not be added to the data set\n";
+                     	}
                      }
                 
             } catch (Exception e) {
@@ -587,21 +606,15 @@ public class GUI {
 			
 			
 			//90-100%
-			graph=graph+"90->100%: ";
+			graph=graph+"90->100+%: ";
 			for(int i=0; i<dataSet.size(); i++) {
-				if( 90 <= dataSet.get(i)  && dataSet.get(i) < 100) {
+				if( 90 <= dataSet.get(i)  && dataSet.get(i) <= 100) {
 					graph=graph+"*";
 				}
 			}
 			graph=graph+"\n";
 			
-			//100%+
-			graph=graph+"100%+: ";
-			for(int i=0; i<dataSet.size(); i++) {
-				if( 90 <= dataSet.get(i)  && dataSet.get(i) < 100) {
-					graph=graph+"*";
-				}
-			}
+			
 			
 			
 			
