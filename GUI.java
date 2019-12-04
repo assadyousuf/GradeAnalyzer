@@ -6,6 +6,8 @@ import java.awt.GridBagConstraints;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import java.awt.Insets;
+import java.awt.PrintGraphics;
+
 import javax.swing.JTextArea;
 import javax.swing.JLabel;
 import java.awt.Font;
@@ -20,6 +22,11 @@ import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
+import javax.swing.JScrollPane;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
 
 public class GUI {
 
@@ -29,6 +36,8 @@ public class GUI {
 	private JTextField txtMaxGrade;
 	private JTextField txtGradeToDelete;
 	private ArrayList<Double> dataSet=new ArrayList<Double>();
+	private JTextArea UserHistoryTextArea = new JTextArea();
+	private JTextArea textArea = new JTextArea();
 	/**
 	 * Launch the application.
 	 */
@@ -58,24 +67,13 @@ public class GUI {
 	private void initialize() {
 		
 		frame = new JFrame();
-		frame.setBounds(100, 100, 810, 501);
+		frame.setBounds(100, 100, 1019, 708);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		GridBagLayout gridBagLayout = new GridBagLayout();
-		gridBagLayout.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0};
-		gridBagLayout.rowHeights = new int[]{0, 0, 0};
-		gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
-		gridBagLayout.rowWeights = new double[]{1.0, 0.0, Double.MIN_VALUE};
-		frame.getContentPane().setLayout(gridBagLayout);
+		frame.getContentPane().setLayout(new GridLayout(0, 2, 0, 0));
 		
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		GridBagConstraints gbc_tabbedPane = new GridBagConstraints();
-		gbc_tabbedPane.insets = new Insets(0, 0, 5, 0);
-		gbc_tabbedPane.gridwidth = 6;
-		gbc_tabbedPane.fill = GridBagConstraints.BOTH;
-		gbc_tabbedPane.gridx = 0;
-		gbc_tabbedPane.gridy = 0;
-		frame.getContentPane().add(tabbedPane, gbc_tabbedPane);
+		frame.getContentPane().add(tabbedPane);
 		
 		//tab 1 begins
 		JCheckBox chckbxAppendGrade=new JCheckBox("Append Grade");
@@ -100,6 +98,9 @@ public class GUI {
 	                    String fileExtention= file.getName().substring(file.getName().lastIndexOf('.') + 1);
 	                    
 	                    if(!chckbxAppendGrade.isSelected()) {
+	                    	UserHistoryTextArea.append("Wiping current user histroy..");
+	                    	UserHistoryTextArea.setText("");
+	                    	textArea.setText("");
 	                    	dataSet.clear();
 	                    }
 	                    
@@ -211,22 +212,25 @@ public class GUI {
 		gbc_txtGradeToDelete.gridy = 7;
 		DataEntryTab.add(txtGradeToDelete, gbc_txtGradeToDelete);
 		txtGradeToDelete.setColumns(10);
-		
-		//tab 2 begins
-		JTextArea textArea = new JTextArea();
 		JPanel AnalysisTab = new JPanel();
 		tabbedPane.addTab("Analysis", null, AnalysisTab, null);
 		GridBagLayout gbl_AnalysisTab = new GridBagLayout();
-		gbl_AnalysisTab.columnWidths = new int[]{148, 132, 0};
+		gbl_AnalysisTab.columnWidths = new int[]{148, 0};
 		gbl_AnalysisTab.rowHeights = new int[]{29, 0, 0, 0, 0, 0};
-		gbl_AnalysisTab.columnWeights = new double[]{1.0, 0.0, Double.MIN_VALUE};
+		gbl_AnalysisTab.columnWeights = new double[]{1.0, Double.MIN_VALUE};
 		gbl_AnalysisTab.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
 		AnalysisTab.setLayout(gbl_AnalysisTab);
+		
+		
+		//tab 2 begins
+		JScrollPane scrollPane_2 = new JScrollPane();
+		
 		
 		JButton btnGenerateData = new JButton("Generate Data");
 		btnGenerateData.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(e.getSource() == btnGenerateData) {
+					UserHistoryTextArea.append("Generating Data..\n");
 					textArea.setText("");
 					textArea.append("Number Of Enteries:" + DataAnalysis.getNumEntries(dataSet) + "\n");
 					textArea.append("Highest Grade:" + DataAnalysis.getHighestGrade(dataSet) + "\n");
@@ -243,8 +247,7 @@ public class GUI {
 			}
 		});
 		GridBagConstraints gbc_btnGenerateData = new GridBagConstraints();
-		gbc_btnGenerateData.gridwidth = 2;
-		gbc_btnGenerateData.insets = new Insets(0, 0, 5, 5);
+		gbc_btnGenerateData.insets = new Insets(0, 0, 5, 0);
 		gbc_btnGenerateData.anchor = GridBagConstraints.NORTH;
 		gbc_btnGenerateData.gridx = 0;
 		gbc_btnGenerateData.gridy = 0;
@@ -256,6 +259,7 @@ public class GUI {
 				if(e.getSource() == btnDisplayColumns) {
 					textArea.setText("");
 					for(int i=0; i<dataSet.size(); i++) {
+						UserHistoryTextArea.append("Displaying Columns..\n");
 						
 						textArea.append(Double.toString(dataSet.get(i)) + "\n");
 					}
@@ -264,8 +268,7 @@ public class GUI {
 		});
 		
 		GridBagConstraints gbc_btnDisplayColumns = new GridBagConstraints();
-		gbc_btnDisplayColumns.gridwidth = 2;
-		gbc_btnDisplayColumns.insets = new Insets(0, 0, 5, 5);
+		gbc_btnDisplayColumns.insets = new Insets(0, 0, 5, 0);
 		gbc_btnDisplayColumns.gridx = 0;
 		gbc_btnDisplayColumns.gridy = 1;
 		AnalysisTab.add(btnDisplayColumns, gbc_btnDisplayColumns);
@@ -273,11 +276,13 @@ public class GUI {
 		JButton btnDisplayGraph = new JButton("Display Graph");
 		btnDisplayGraph.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if(e.getSource()==btnDisplayGraph) {
+					textArea.append(displayGraph());
+				}
 			}
 		});
 		GridBagConstraints gbc_btnDisplayGraph = new GridBagConstraints();
-		gbc_btnDisplayGraph.gridwidth = 2;
-		gbc_btnDisplayGraph.insets = new Insets(0, 0, 5, 5);
+		gbc_btnDisplayGraph.insets = new Insets(0, 0, 5, 0);
 		gbc_btnDisplayGraph.gridx = 0;
 		gbc_btnDisplayGraph.gridy = 2;
 		AnalysisTab.add(btnDisplayGraph, gbc_btnDisplayGraph);
@@ -288,38 +293,41 @@ public class GUI {
 			}
 		});
 		GridBagConstraints gbc_btnDistribution = new GridBagConstraints();
-		gbc_btnDistribution.gridwidth = 2;
-		gbc_btnDistribution.insets = new Insets(0, 0, 5, 5);
+		gbc_btnDistribution.insets = new Insets(0, 0, 5, 0);
 		gbc_btnDistribution.gridx = 0;
 		gbc_btnDistribution.gridy = 3;
 		AnalysisTab.add(btnDistribution, gbc_btnDistribution);
 		
+		JScrollPane scrollPane_3 = new JScrollPane();
+		GridBagConstraints gbc_scrollPane_3 = new GridBagConstraints();
+		gbc_scrollPane_3.fill = GridBagConstraints.BOTH;
+		gbc_scrollPane_3.gridx = 0;
+		gbc_scrollPane_3.gridy = 4;
+		AnalysisTab.add(scrollPane_3, gbc_scrollPane_3);
 		
-		GridBagConstraints gbc_textArea = new GridBagConstraints();
-		gbc_textArea.gridwidth = 2;
-		gbc_textArea.fill = GridBagConstraints.BOTH;
-		gbc_textArea.gridx = 0;
-		gbc_textArea.gridy = 4;
-		AnalysisTab.add(textArea, gbc_textArea);
+		
+		
+		scrollPane_3.setViewportView(textArea);
 		
 		//tab 3 begins
 		JPanel ErrorsTab = new JPanel();
 		tabbedPane.addTab("Errors", null, ErrorsTab, null);
 		GridBagLayout gbl_ErrorsTab = new GridBagLayout();
-		gbl_ErrorsTab.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
-		gbl_ErrorsTab.rowHeights = new int[]{0, 0, 0, 0};
-		gbl_ErrorsTab.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
-		gbl_ErrorsTab.rowWeights = new double[]{0.0, 0.0, 1.0, Double.MIN_VALUE};
+		gbl_ErrorsTab.columnWidths = new int[]{0, 0};
+		gbl_ErrorsTab.rowHeights = new int[]{0, 0};
+		gbl_ErrorsTab.columnWeights = new double[]{1.0, Double.MIN_VALUE};
+		gbl_ErrorsTab.rowWeights = new double[]{1.0, Double.MIN_VALUE};
 		ErrorsTab.setLayout(gbl_ErrorsTab);
 		
-		JTextArea textArea_2 = new JTextArea();
-		GridBagConstraints gbc_textArea_2 = new GridBagConstraints();
-		gbc_textArea_2.gridheight = 3;
-		gbc_textArea_2.gridwidth = 7;
-		gbc_textArea_2.fill = GridBagConstraints.BOTH;
-		gbc_textArea_2.gridx = 0;
-		gbc_textArea_2.gridy = 0;
-		ErrorsTab.add(textArea_2, gbc_textArea_2);
+		JScrollPane scrollPane_1 = new JScrollPane();
+		GridBagConstraints gbc_scrollPane_1 = new GridBagConstraints();
+		gbc_scrollPane_1.fill = GridBagConstraints.BOTH;
+		gbc_scrollPane_1.gridx = 0;
+		gbc_scrollPane_1.gridy = 0;
+		ErrorsTab.add(scrollPane_1, gbc_scrollPane_1);
+		
+		JTextArea textArea_1 = new JTextArea();
+		scrollPane_1.setViewportView(textArea_1);
 		
 		JPanel ReportTab = new JPanel();
 		tabbedPane.addTab("Report", null, ReportTab, null);
@@ -352,10 +360,17 @@ public class GUI {
 		gbc_btnNewButton_2.gridx = 4;
 		gbc_btnNewButton_2.gridy = 3;
 		ReportTab.add(btnNewButton_2, gbc_btnNewButton_2);
+		
+		JScrollPane scrollPane = new JScrollPane();
+		frame.getContentPane().add(scrollPane);
+		
+		
+		scrollPane.setViewportView(UserHistoryTextArea);
 	}
 	
 	public void ReadinDataSet(boolean fileType, File file) {
         if(fileType == true) {
+        	UserHistoryTextArea.append("Reading in the file " + file.getName() + "\n");
             try {
                 BufferedReader br = new BufferedReader(new FileReader(file));
                 Scanner rd = new Scanner(br);
@@ -373,6 +388,7 @@ public class GUI {
 
         }
         else if(fileType == false) {
+        	UserHistoryTextArea.append("Reading in the file " + file.getName() + "\n");
         	try {
                 BufferedReader br = new BufferedReader(new FileReader(file));
                 Scanner rd = new Scanner(br);
@@ -407,6 +423,123 @@ public class GUI {
 				i=-1; //resets i to start from beggining of arraylist again
 			}
 		}
+	}
+	
+	
+	public String displayGraph() {
+		String graph="";
+		if(dataSet.size()==0) {
+			return null;
+		}
+		
+		else {
+			//0-10%
+			graph = graph + "0->10%: ";
+			for(int i=0; i<dataSet.size(); i++) {
+				if( 0 <= dataSet.get(i)  && dataSet.get(i)< 10) {
+					graph=graph+"*";
+				}
+			}
+			graph=graph+"\n";
+			
+			
+			//10-20%
+			graph=graph+"10->20%: ";
+			for(int i=0; i<dataSet.size(); i++) {
+				if( 10 <= dataSet.get(i)  && dataSet.get(i)< 20) {
+					graph=graph+"*";
+				}
+			}
+			graph=graph+"\n";
+			
+			
+			
+			//30-40%
+			graph=graph+"30->40%: ";
+			for(int i=0; i<dataSet.size(); i++) {
+				if( 30 <= dataSet.get(i)  && dataSet.get(i)< 40) {
+					graph=graph+"*";
+				}
+			}
+			graph=graph+"\n";
+			
+			
+			
+			//40-50%
+			graph=graph+"40->50%: ";
+			for(int i=0; i<dataSet.size(); i++) {
+				if( 40 <= dataSet.get(i)  && dataSet.get(i)< 50) {
+					graph=graph+"*";
+				}
+			}
+			graph=graph+"\n";
+			
+			
+			//50-60%
+			graph=graph+"50->60%: ";
+			for(int i=0; i<dataSet.size(); i++) {
+				if( 50 <= dataSet.get(i)  && dataSet.get(i)< 60) {
+					graph=graph+"*";
+				}
+			}
+			graph=graph+"\n";
+			
+			
+			
+			//60-70%
+			graph=graph+"60->70%: ";
+			for(int i=0; i<dataSet.size(); i++) {
+				if( 60 <= dataSet.get(i)  && dataSet.get(i)< 70) {
+					graph=graph+"*";
+				}
+			}
+			graph=graph+"\n";
+			
+			
+			
+			//80-90%
+			graph=graph+"80->90%: ";
+			for(int i=0; i<dataSet.size(); i++) {
+				if( 80 <= dataSet.get(i)  && dataSet.get(i)< 90) {
+					graph=graph+"*";
+				}
+			}
+			graph=graph+"\n";
+			
+			
+			
+			//90-100%
+			graph=graph+"90->100%: ";
+			for(int i=0; i<dataSet.size(); i++) {
+				if( 90 <= dataSet.get(i)  && dataSet.get(i) < 100) {
+					graph=graph+"*";
+				}
+			}
+			graph=graph+"\n";
+			
+			//100%+
+			graph=graph+"100%+: ";
+			for(int i=0; i<dataSet.size(); i++) {
+				if( 90 <= dataSet.get(i)  && dataSet.get(i) < 100) {
+					graph=graph+"*";
+				}
+			}
+			
+			
+			
+			graph=graph+"\n";
+			
+			
+			
+			
+			
+			
+			
+		}
+		
+		
+		return graph;
+		
 	}
 	
 
