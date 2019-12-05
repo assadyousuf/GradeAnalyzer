@@ -73,7 +73,7 @@ public class GUI {
 	 */
 	private void initialize() {
 		
-		frame = new JFrame();
+		frame = new JFrame("Grade Analyzer");
 		frame.setBounds(100, 100, 1019, 708);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(new GridLayout(0, 2, 0, 0));
@@ -159,7 +159,14 @@ public class GUI {
 				}
 			}
 		});
-		txtInputGrade.setText("Input Grade");
+		
+		JLabel lblInputGrade = new JLabel("Input Grade");
+		GridBagConstraints gbc_lblInputGrade = new GridBagConstraints();
+		gbc_lblInputGrade.insets = new Insets(0, 0, 5, 5);
+		gbc_lblInputGrade.anchor = GridBagConstraints.EAST;
+		gbc_lblInputGrade.gridx = 0;
+		gbc_lblInputGrade.gridy = 2;
+		DataEntryTab.add(lblInputGrade, gbc_lblInputGrade);
 		GridBagConstraints gbc_txtInputGrade = new GridBagConstraints();
 		gbc_txtInputGrade.insets = new Insets(0, 0, 5, 5);
 		gbc_txtInputGrade.fill = GridBagConstraints.HORIZONTAL;
