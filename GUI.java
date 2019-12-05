@@ -323,6 +323,13 @@ public class GUI {
 		JButton btnGenerateData = new JButton("Generate Data");
 		btnGenerateData.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				
+				if(checkIfDatatSetIsEmpty()==true) {
+					UserHistoryTextArea.append("Cannot generate data for empty dataset!\n");
+				}
+				
+				 Collections.sort(dataSet);
+				
 				analysis="Number Of Entries:" + DataAnalysis.getNumEntries(dataSet) + "\n"+
 						"Highest Grade:" + DataAnalysis.getHighestGrade(dataSet) + "\n"+
 						"Mean:" + DataAnalysis.getMean(dataSet) + "\n"+
