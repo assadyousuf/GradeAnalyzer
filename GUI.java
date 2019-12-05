@@ -610,6 +610,23 @@ public class GUI {
 			
 			
 			
+			
+			
+
+			//60-70%
+			graph=graph+"70->80%: ";
+			for(int i=0; i<dataSet.size(); i++) {
+				if( 70 <= dataSet.get(i)  && dataSet.get(i)< 80) {
+					graph=graph+"*";
+				}
+			}
+			graph=graph+"\n";
+			
+			
+			
+			
+			
+			
 			//80-90%
 			graph=graph+"80->90%: ";
 			for(int i=0; i<dataSet.size(); i++) {
