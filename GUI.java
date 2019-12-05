@@ -147,7 +147,7 @@ public class GUI {
 						try { 
 						double numAdded=Double.parseDouble(txtInputGrade.getText());
 						dataSet.add(numAdded);
-						UserHistoryTextArea.append("Adding" + numAdded + "to dataset...\n");
+						UserHistoryTextArea.append("Adding " + numAdded + "to dataset...\n");
 						}
 						catch(Exception error) {
 							UserHistoryTextArea.append("ERROR: Grade Inputed is not a number...\n");
