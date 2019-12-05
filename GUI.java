@@ -14,8 +14,11 @@ import java.awt.Font;
 import java.awt.event.ActionListener;
 import java.awt.print.Printable;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.awt.event.ActionEvent;
@@ -25,6 +28,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JScrollPane;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.font.GraphicAttribute;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import javax.swing.event.ChangeListener;
@@ -46,6 +50,7 @@ public class GUI {
 	private JTextArea textArea = new JTextArea();
 	private String errorLogString="";
 	private JTextArea textArea_1 = new JTextArea();
+	private String analysis;
 	/**
 	 * Launch the application.
 	 */
@@ -110,6 +115,11 @@ public class GUI {
 					final JFileChooser fc = new JFileChooser();
 	                if (e.getSource() == btnNewButton) {
 	                    int returnVal = fc.showOpenDialog(frame);
+	                    
+	                    if(returnVal==JFileChooser.CANCEL_OPTION || returnVal==JFileChooser.ERROR_OPTION) {
+	                    	UserHistoryTextArea.append("User did not choose file...\n");
+	                    }
+	                    
 	                    File file = fc.getSelectedFile();
 	                    String fileExtention= file.getName().substring(file.getName().lastIndexOf('.') + 1);
 	                    
@@ -125,6 +135,9 @@ public class GUI {
 	                    	ReadinDataSet(true, file);
 	                    } else if(fileExtention.charAt(0) == 't') { //checks if its a .txt file
 	                    	ReadinDataSet(false, file);
+	                    } 
+	                    else {
+	                    	UserHistoryTextArea.append("File user is trying to open is not .csv or .txt ...\n");
 	                    }
 	                }
 				}
@@ -149,7 +162,7 @@ public class GUI {
 						try { 
 						double numAdded=Double.parseDouble(txtInputGrade.getText());
 						dataSet.add(numAdded);
-						UserHistoryTextArea.append("Adding " + numAdded + "to dataset...\n");
+						UserHistoryTextArea.append("Adding " + numAdded + " to dataset...\n");
 						}
 						catch(Exception error) {
 							UserHistoryTextArea.append("ERROR: Grade Inputed is not a number...\n");
@@ -307,14 +320,15 @@ public class GUI {
 		JButton btnGenerateData = new JButton("Generate Data");
 		btnGenerateData.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				analysis="Number Of Entries:" + DataAnalysis.getNumEntries(dataSet) + "\n"+
+						"Highest Grade:" + DataAnalysis.getHighestGrade(dataSet) + "\n"+
+						"Mean:" + DataAnalysis.getMean(dataSet) + "\n"+
+						"Median:" + DataAnalysis.getMedian(dataSet) + "\n";
+				
 				if(e.getSource() == btnGenerateData && checkIfDatatSetIsEmpty()==false) {
 					UserHistoryTextArea.append("Generating Data..\n");
 					textArea.setText("");
-					textArea.append("Number Of Enteries:" + DataAnalysis.getNumEntries(dataSet) + "\n");
-					textArea.append("Highest Grade:" + DataAnalysis.getHighestGrade(dataSet) + "\n");
-					textArea.append("Lowest Grade:" + DataAnalysis.getLowestGrade(dataSet) + "\n");
-					textArea.append("Mean:" + DataAnalysis.getMean(dataSet) + "\n");
-					textArea.append("Median:" + DataAnalysis.getMedian(dataSet) + "\n");
+					textArea.append(analysis);
 					if(DataAnalysis.getMode(dataSet).isEmpty()) {
 						textArea.append("Mode:" + "\n");
 					}
@@ -439,29 +453,20 @@ public class GUI {
 		gbl_ReportTab.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
 		ReportTab.setLayout(gbl_ReportTab);
 		
-		
-		//tab 4 begins
-		JButton btnNewButton_1 = new JButton("Generate Report");
-		btnNewButton_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		GridBagConstraints gbc_btnNewButton_1 = new GridBagConstraints();
-		gbc_btnNewButton_1.insets = new Insets(0, 0, 5, 0);
-		gbc_btnNewButton_1.gridx = 4;
-		gbc_btnNewButton_1.gridy = 2;
-		ReportTab.add(btnNewButton_1, gbc_btnNewButton_1);
-		
 		JButton btnNewButton_2 = new JButton("Download");
 		btnNewButton_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if(e.getSource()==btnNewButton_2) {
+					DownloadReport();
+					
+				}
 				
 			}
 		});
 		GridBagConstraints gbc_btnNewButton_2 = new GridBagConstraints();
 		gbc_btnNewButton_2.insets = new Insets(0, 0, 5, 0);
 		gbc_btnNewButton_2.gridx = 4;
-		gbc_btnNewButton_2.gridy = 3;
+		gbc_btnNewButton_2.gridy = 2;
 		ReportTab.add(btnNewButton_2, gbc_btnNewButton_2);
 		
 		JScrollPane scrollPane = new JScrollPane();
@@ -487,7 +492,7 @@ public class GUI {
                 	String numadded=rd.next();
                 	try {
                 	dataSet.add(Double.parseDouble(numadded));
-                	UserHistoryTextArea.append("Adding " + numadded + " to dataset..\n");
+                	UserHistoryTextArea.append("Adding " + numadded + "  to dataset..\n");
                 	}
                 	catch(Exception error) {
                 		UserHistoryTextArea.append( numadded + " is not an integer or a float so it will not be added to the data set\n");
@@ -701,6 +706,55 @@ public class GUI {
 		else {
 			return false;
 		}
+		
+	}
+	
+	
+	public void DownloadReport() {
+		
+		if(checkIfDatatSetIsEmpty()==true) {
+			UserHistoryTextArea.append("Cannot generate report for empty dataset!\n");
+			return;
+		}
+		
+		final JFileChooser fc = new JFileChooser();
+		int returnVal=fc.showSaveDialog(frame);
+		
+		  
+        if(returnVal==JFileChooser.CANCEL_OPTION || returnVal==JFileChooser.ERROR_OPTION) {
+        	UserHistoryTextArea.append("User did not download the report file...\n");
+        }
+		
+		
+		File reportFile=fc.getSelectedFile();
+		String report="Data:\n";
+		
+		String fileExtention= reportFile.getName().substring(reportFile.getName().lastIndexOf('.') + 1);
+        
+		analysis="Number Of Entries:" + DataAnalysis.getNumEntries(dataSet) + "\n"+
+				"Highest Grade:" + DataAnalysis.getHighestGrade(dataSet) + "\n"+
+				"Mean:" + DataAnalysis.getMean(dataSet) + "\n"+
+				"Median:" + DataAnalysis.getMedian(dataSet) + "\n";
+		
+		 report="Data:\n" + "\n" + "Analysis:\n"+analysis + "\n"+  "Graph:\n" + displayGraph() + "Distribution:\n" + DataDistribution.displayDistrbution(dataSet); 
+		
+		if(fileExtention.charAt(0)=='t') {
+			try {
+				FileWriter fileWriter = new FileWriter(reportFile);
+				fileWriter.write(report);
+				fileWriter.close();
+				UserHistoryTextArea.append("Saving " + reportFile.getName() + "\n");
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				UserHistoryTextArea.append("Error with saving report\n");
+			}
+			
+		} else {
+			UserHistoryTextArea.append("Please choose a text file or give your report file a .txt extension\n");
+		}
+		
 		
 	}
 	
