@@ -83,6 +83,7 @@ public class GUI {
 		tabbedPane.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				if(tabbedPane.getSelectedIndex()==2) {
+					textArea_1.setText("");
 					textArea_1.append(errorLogString);
 				}
 			}
