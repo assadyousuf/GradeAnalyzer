@@ -1,4 +1,5 @@
 import java.awt.EventQueue;
+import java.lang.Math;
 import javax.swing.JFrame;
 import java.awt.GridBagLayout;
 import javax.swing.JTabbedPane;
@@ -20,6 +21,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Scanner;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
@@ -324,6 +327,7 @@ public class GUI {
 						"Highest Grade:" + DataAnalysis.getHighestGrade(dataSet) + "\n"+
 						"Mean:" + DataAnalysis.getMean(dataSet) + "\n"+
 						"Median:" + DataAnalysis.getMedian(dataSet) + "\n";
+					    
 				
 				if(e.getSource() == btnGenerateData && checkIfDatatSetIsEmpty()==false) {
 					UserHistoryTextArea.append("Generating Data..\n");
@@ -355,11 +359,7 @@ public class GUI {
 				if(e.getSource() == btnDisplayColumns && checkIfDatatSetIsEmpty()==false) {
 					textArea.setText("");
 					UserHistoryTextArea.append("Displaying Columns..\n");
-					for(int i=0; i<dataSet.size(); i++) {
-						
-						
-						textArea.append(Double.toString(dataSet.get(i)) + "\n");
-					}
+					textArea.append(showData(dataSet));
 				} else if(checkIfDatatSetIsEmpty() == true) {
 					UserHistoryTextArea.append("Cannot Display Columns of an Empty dataset!\n");
 					errorLogString=errorLogString+"Cannot Display Columns of an Empty dataset!\n";
@@ -734,9 +734,10 @@ public class GUI {
 		analysis="Number Of Entries:" + DataAnalysis.getNumEntries(dataSet) + "\n"+
 				"Highest Grade:" + DataAnalysis.getHighestGrade(dataSet) + "\n"+
 				"Mean:" + DataAnalysis.getMean(dataSet) + "\n"+
-				"Median:" + DataAnalysis.getMedian(dataSet) + "\n";
+				"Median:" + DataAnalysis.getMedian(dataSet) + "\n"+
+				"Mode:" + DataAnalysis.getMode(dataSet) + "\n";
 		
-		 report="Data:\n" + "\n" + "Analysis:\n"+analysis + "\n"+  "Graph:\n" + displayGraph() + "Distribution:\n" + DataDistribution.displayDistrbution(dataSet); 
+		 report="Data:\n" + showData(dataSet) + "\n" + "Analysis:\n"+analysis + "\n"+  "Graph:\n" + displayGraph() + "Distribution:\n" + DataDistribution.displayDistrbution(dataSet); 
 		
 		if(fileExtention.charAt(0)=='t') {
 			try {
@@ -757,6 +758,41 @@ public class GUI {
 		
 		
 	}
+	
+	
+public String showData(ArrayList<Double> data) {
+	 Collections.sort(data, Collections.reverseOrder());
+
+	 Object[] array1d= (Object[]) data.toArray();
+	
+	 int columns=(int) Math.ceil(data.size()/4.0);
+	 int rows=4;
+	 Double array2d[][] = new Double[columns][rows];
+     for(int i=0;i<columns;i++) {
+    	 for(int j=0;j<rows;j++) {
+    		 if( ( (j*columns) + i) < array1d.length) {
+    		 array2d[i][j]=(Double) array1d[(j*columns) + i];
+    		 } else {
+    			 break;
+    		 }
+    	 }
+     }
+    
+     	//iterate through 2d array created up top and add it to string
+     String rString="";
+     for(int i=0;i<array2d.length;i++) {
+    	rString=rString+"Row :"+Integer.toString(i);
+     for(int j=0;j<array2d[i].length; j++) {
+    	 
+    	if(array2d[i][j]!=null) { 
+    	rString= rString+"\t"+ array2d[i][j].toString();}
+    	
+     }
+     rString=rString+"\n";
+	 
+}
+     return rString;
+}
 	
 	
 
