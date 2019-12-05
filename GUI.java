@@ -549,6 +549,22 @@ public class GUI {
 			}
 			graph=graph+"\n";
 			
+		
+			
+
+			//20-30%
+			graph=graph+"20->30%: ";
+			for(int i=0; i<dataSet.size(); i++) {
+				if( 20 <= dataSet.get(i)  && dataSet.get(i)< 30) {
+					graph=graph+"*";
+				}
+			}
+			graph=graph+"\n";
+			
+			
+			
+			
+			
 			
 			
 			//30-40%
