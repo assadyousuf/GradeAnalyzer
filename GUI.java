@@ -32,6 +32,7 @@ import javax.swing.event.ChangeListener;
 import org.omg.PortableInterceptor.ServerRequestInfo;
 
 import javax.swing.event.ChangeEvent;
+import javax.swing.SwingConstants;
 
 public class GUI {
 
@@ -468,6 +469,9 @@ public class GUI {
 		
 		
 		scrollPane.setViewportView(UserHistoryTextArea);
+		
+		JLabel lblUserHistory = new JLabel(" User History");
+		scrollPane.setColumnHeaderView(lblUserHistory);
 	}
 	
 	public void ReadinDataSet(boolean fileType, File file) {
