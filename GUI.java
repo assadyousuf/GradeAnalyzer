@@ -180,9 +180,15 @@ public class GUI {
 		gbc_chckbxAppendGrade.gridy = 3;
 		DataEntryTab.add(chckbxAppendGrade, gbc_chckbxAppendGrade);
 		
-		txtMinGrade = new JTextField();
+		JLabel lblMinGrade = new JLabel("Min Grade");
+		GridBagConstraints gbc_lblMinGrade = new GridBagConstraints();
+		gbc_lblMinGrade.insets = new Insets(0, 0, 5, 5);
+		gbc_lblMinGrade.anchor = GridBagConstraints.EAST;
+		gbc_lblMinGrade.gridx = 0;
+		gbc_lblMinGrade.gridy = 4;
+		DataEntryTab.add(lblMinGrade, gbc_lblMinGrade);
 		
-		txtMinGrade.setText("Min Grade");
+		txtMinGrade = new JTextField();
 		GridBagConstraints gbc_txtMinGrade = new GridBagConstraints();
 		gbc_txtMinGrade.insets = new Insets(0, 0, 5, 5);
 		gbc_txtMinGrade.fill = GridBagConstraints.HORIZONTAL;
@@ -191,8 +197,15 @@ public class GUI {
 		DataEntryTab.add(txtMinGrade, gbc_txtMinGrade);
 		txtMinGrade.setColumns(10);
 		
+		JLabel lblMaxGrade = new JLabel("Max Grade");
+		GridBagConstraints gbc_lblMaxGrade = new GridBagConstraints();
+		gbc_lblMaxGrade.insets = new Insets(0, 0, 5, 5);
+		gbc_lblMaxGrade.anchor = GridBagConstraints.EAST;
+		gbc_lblMaxGrade.gridx = 0;
+		gbc_lblMaxGrade.gridy = 5;
+		DataEntryTab.add(lblMaxGrade, gbc_lblMaxGrade);
+		
 		txtMaxGrade = new JTextField();
-		txtMaxGrade.setText("Max Grade");
 		GridBagConstraints gbc_txtMaxGrade = new GridBagConstraints();
 		gbc_txtMaxGrade.insets = new Insets(0, 0, 5, 5);
 		gbc_txtMaxGrade.fill = GridBagConstraints.HORIZONTAL;
