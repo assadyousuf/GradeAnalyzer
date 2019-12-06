@@ -165,6 +165,7 @@ public class GUI {
 						try { 
 						double numAdded=Double.parseDouble(txtInputGrade.getText());
 						dataSet.add(numAdded);
+						txtInputGrade.setText("");
 						UserHistoryTextArea.append("Adding " + numAdded + " to dataset...\n");
 						}
 						catch(Exception error) {
@@ -286,6 +287,7 @@ public class GUI {
 					}
 					if(DataAnalysis.deleteGrade(dataSet,gradeToDelete) == true) {
 				UserHistoryTextArea.append("Deleting Grade " + gradeToDelete + "...");
+				txtGradeToDelete.setText("");
 					} else {
 						errorLogString=errorLogString+"The grade "+gradeToDelete + " is not in the dataset\n";
 						UserHistoryTextArea.append("The grade "+gradeToDelete + " is not in the dataset\n");
@@ -298,7 +300,14 @@ public class GUI {
 			
 			}
 		});
-		txtGradeToDelete.setText("Grade to Delete");
+		
+		JLabel lblDeleteGrade = new JLabel("Delete Grade");
+		GridBagConstraints gbc_lblDeleteGrade = new GridBagConstraints();
+		gbc_lblDeleteGrade.insets = new Insets(0, 0, 5, 5);
+		gbc_lblDeleteGrade.anchor = GridBagConstraints.EAST;
+		gbc_lblDeleteGrade.gridx = 0;
+		gbc_lblDeleteGrade.gridy = 7;
+		DataEntryTab.add(lblDeleteGrade, gbc_lblDeleteGrade);
 		GridBagConstraints gbc_txtGradeToDelete = new GridBagConstraints();
 		gbc_txtGradeToDelete.insets = new Insets(0, 0, 5, 5);
 		gbc_txtGradeToDelete.fill = GridBagConstraints.HORIZONTAL;
@@ -326,6 +335,7 @@ public class GUI {
 				
 				if(checkIfDatatSetIsEmpty()==true) {
 					UserHistoryTextArea.append("Cannot generate data for empty dataset!\n");
+				
 				}
 				
 				 Collections.sort(dataSet);
@@ -768,37 +778,8 @@ public class GUI {
 	
 	
 public String showData(ArrayList<Double> data) {
-	 Collections.sort(data, Collections.reverseOrder());
-
-	 Object[] array1d= (Object[]) data.toArray();
-	
-	 int columns=(int) Math.ceil(data.size()/4.0);
-	 int rows=4;
-	 Double array2d[][] = new Double[columns][rows];
-     for(int i=0;i<columns;i++) {
-    	 for(int j=0;j<rows;j++) {
-    		 if( ( (j*columns) + i) < array1d.length) {
-    		 array2d[i][j]=(Double) array1d[(j*columns) + i];
-    		 } else {
-    			 break;
-    		 }
-    	 }
-     }
-    
-     	//iterate through 2d array created up top and add it to string
-     String rString="";
-     for(int i=0;i<array2d.length;i++) {
-    	rString=rString+"Row :"+Integer.toString(i);
-     for(int j=0;j<array2d[i].length; j++) {
-    	 
-    	if(array2d[i][j]!=null) { 
-    	rString= rString+"\t"+ array2d[i][j].toString();}
-    	
-     }
-     rString=rString+"\n";
-	 
-}
-     return rString;
+return ColumnPrint.getDataInColumns(dataSet);
+  
 }
 	
 	
