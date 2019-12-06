@@ -36,7 +36,6 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import javax.swing.event.ChangeListener;
 
-import org.omg.PortableInterceptor.ServerRequestInfo;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.SwingConstants;
